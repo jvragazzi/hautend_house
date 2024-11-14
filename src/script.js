@@ -320,6 +320,59 @@ const controls = new OrbitControls(camera, canvas)
 controls.enableDamping = true
 
 /**
+ * Sound
+ */
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+const sound = new THREE.Audio(listener);
+const audioLoader = new THREE.AudioLoader();
+
+// Carregar e preparar o áudio
+audioLoader.load(
+    './music/horrorambiance3.mp3', // Verifique se o caminho do arquivo está correto
+    (buffer) => {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.5);
+
+        // Tentar reproduzir o som automaticamente
+        const playAudio = () => {
+            sound.play();
+            console.log('Audio started automatically');
+            // Remover o listener após a primeira interação bem-sucedida
+            window.removeEventListener('click', playAudio);
+        };
+
+        // Adicionar evento de fallback caso o autoplay falhe
+        window.addEventListener('click', playAudio);
+
+        // Tentativa de reprodução automática
+        try {
+            sound.play();
+        } catch (error) {
+            console.warn(
+                'Autoplay failed. Waiting for user interaction to start audio.'
+            );
+        }
+    },
+    undefined,
+    (error) => {
+        console.error('Error loading audio:', error);
+    }
+);
+
+
+// Ative o som após uma interação do usuário
+window.addEventListener('click', () => {
+    if (!sound.isPlaying) {
+        sound.play();
+        console.log('Audio started');
+    }
+});
+
+
+/**
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
