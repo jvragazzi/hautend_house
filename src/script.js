@@ -329,38 +329,30 @@ const audioLoader = new THREE.AudioLoader();
 
 // Carregar e preparar o áudio
 audioLoader.load(
-    './music/horrorambiance3.mp3', // Verifique se o caminho do arquivo está correto
-    (buffer) => {
+    '/music/horrorambiance3.mp3', (buffer) => {
         sound.setBuffer(buffer);
         sound.setLoop(true);
         sound.setVolume(0.5);
 
-        // Tentar reproduzir o som automaticamente
+        // Fallback para user interaction
         const playAudio = () => {
-            sound.play();
-            console.log('Audio started automatically');
-            // Remover o listener após a primeira interação bem-sucedida
-            window.removeEventListener('click', playAudio);
+            try {
+                sound.play();
+                console.log('Audio started');
+                window.removeEventListener('click', playAudio); // Remove o evento após o sucesso
+            } catch (error) {
+                console.error('Failed to play audio:', error);
+            }
         };
 
-        // Adicionar evento de fallback caso o autoplay falhe
+        // Adicionar evento de clique para fallback
         window.addEventListener('click', playAudio);
-
-        // Tentativa de reprodução automática
-        try {
-            sound.play();
-        } catch (error) {
-            console.warn(
-                'Autoplay failed. Waiting for user interaction to start audio.'
-            );
-        }
     },
     undefined,
     (error) => {
         console.error('Error loading audio:', error);
     }
 );
-
 
 // Ative o som após uma interação do usuário
 window.addEventListener('click', () => {
